@@ -1,0 +1,38 @@
+name: 📦 Azure Storage request
+description: This form is used to create Azure infrastructure
+title: "📦☁️ Create an Azure Storage Account"
+labels: ["issueops:storage"]
+projects: ["returngis/7"]
+assignees:
+  - teams/devs
+  - 0gis0
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for opening an issue to create an Azure Storage Account 📦☁️". Please fill out the sections below.
+  - type: input
+    id: storage_account_name
+    attributes:
+      label: Storage Account Name
+      description: "Please enter the name of the Azure Storage Account"
+    validations:
+      required: true
+  - type: input
+    id: resource_group_name
+    attributes:
+      label: Resource Group
+      description: "Please enter the name of the Azure Resource Group"
+    validations:
+      required: true
+  - type: dropdown
+    id: region
+    attributes:
+      label: Region
+      multiple: true
+      options:
+        - spaincentral
+        - francecentral
+        - westeurope
+        - northeurope
+      default: spaincentral

@@ -1,0 +1,108 @@
+name: 🚀 Deploy Infrastructure
+
+on:
+  issue_comment:
+    types: [created]
+
+
+defaults:
+  run:
+    working-directory: ./terraform
+
+env:
+  ARM_SUBSCRIPTION_ID: ${{ secrets.TF_SUBSCRIPTION_ID }}
+  ARM_CLIENT_ID: ${{ secrets.TF_CLIENT_ID }}
+  ARM_CLIENT_SECRET: ${{ secrets.TF_CLIENT_SECRET }}
+  ARM_TENANT_ID: ${{ secrets.TF_TENANT_ID }}
+
+concurrency:
+  group: ${{ github.event.issue.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  issues: write
+  actions: read
+
+jobs:
+  deploy_infra:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: github/command@v1.2.2
+      id: command
+      with:
+        command: ".deploy"
+        reaction: "rocket"
+        allowed_contexts: "issue"
+        permissions: "maintain,admin"
+        allowlist: 0gis0
+
+    - name: Find Comments
+      id: fc
+      uses: peter-evans/find-comment@v3.1.0
+      with:    
+        issue-number: ${{ github.event.issue.number }}      
+        comment-author: 'github-actions[bot]'    
+        body-includes: 'Run ID'        
+        token: ${{ secrets.GITHUB_TOKEN }}
+  
+    - name: show run id
+      run: |
+          echo "Comment ID: ${{ steps.fc.outputs.comment-id }}"
+          echo "Comment Body: ${{ steps.fc.outputs.comment-body }}"
+          echo "Comment author: ${{ steps.fc.outputs.comment-author }}"
+          echo "Comment create at: ${{ steps.fc.outputs.comment-created-at }}"
+      
+    - name: Get the run ID
+      id: get_run_id
+      run: |
+        echo "Comment Body: ${{ steps.fc.outputs.comment-body }}"
+        echo "::set-output name=run_id::$(echo ${{ steps.fc.outputs.comment-body }} | grep -oP 'Run ID: \K\d+')"
+
+    - name: Download artifact related with this issue
+      uses: actions/download-artifact@v4.1.8
+      with:
+        name: artifact
+        github-token: ${{ github.token }}
+        run-id: ${{ steps.get_run_id.outputs.run_id }}
+        
+    - name: List files in artifact
+      run: ls $GITHUB_WORKSPACE
+
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v3
+
+    - name: Terraform Init 🏗
+      id: init
+      run: | 
+        terraform init \
+        -backend-config="resource_group_name=${{ secrets.TF_STATE_RESOURCE_GROUP_NAME }}" \
+        -backend-config="storage_account_name=${{ secrets.TF_STATE_AZURE_STORAGE_NAME }}" \
+        -backend-config="container_name=${{ secrets.TF_STATE_CONTAINER_NAME }}" \
+        -backend-config="key=issue-${{ github.event.issue.number }}-terraform.tfstate" \
+        -backend-config="access_key=${{ secrets.TF_STATE_STORAGE_ACCESS_KEY }}"
+
+    - name: Terraform Apply     
+      id: apply
+      run: |
+        terraform apply -auto-approve $GITHUB_WORKSPACE/tfplan.out
+
+    - name: Remove Labels
+      id: remove-labels
+      uses: issue-ops/labeler@v2.1.0
+      with:
+        action: remove
+        issue_number: ${{ github.event.issue.number }}
+        labels: |
+          deploying 🚀⌛️         
+
+    - name: Add Labels
+      id: add-labels
+      uses: issue-ops/labeler@v2.1.0
+      with:
+        action: add
+        issue_number: ${{ github.event.issue.number }}
+        labels: |
+          deployed 🚀✅
+          

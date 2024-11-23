@@ -1,0 +1,156 @@
+name: ☝🏻🚀 Request Infrastructure with Terraform and Issues 
+
+on:
+  issues: 
+    types: opened
+
+defaults:
+  run:
+    working-directory: ./terraform
+
+env:
+  ARM_SUBSCRIPTION_ID: ${{ secrets.TF_SUBSCRIPTION_ID }}
+  ARM_CLIENT_ID: ${{ secrets.TF_CLIENT_ID }}
+  ARM_CLIENT_SECRET: ${{ secrets.TF_CLIENT_SECRET }}
+  ARM_TENANT_ID: ${{ secrets.TF_TENANT_ID }}
+
+concurrency:
+  group: ${{ github.event.issue.number }}
+  cancel-in-progress: true
+
+
+jobs:
+  validate_issue_forms:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      issues: write
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Parse Issue
+      id: parser
+      uses: issue-ops/parser@v4.0.0
+      with:
+        body: ${{ github.event.issue.body }}
+        issue-form-template	: create_azure_infra_form.yml
+        workspace: ${{ github.workspace }}
+    
+    - name: Output Issue JSON
+      id: output-issue
+      run: echo ${{ steps.parser.outputs.json }}
+
+    - name: Validate Issue
+      id: validate-issue
+      uses: issue-ops/validator@v0.2.1
+      with:
+        issue-form-template: create_azure_infra_form.yml
+        parsed-issue-body: ${{ steps.parser.outputs.json }}
+        workspace: ${{ github.workspace }}
+
+    - name: Convert Issue Form to Terraform.tfvars
+      run: echo '${{ steps.parser.outputs.json }}' | jq -r 'to_entries|map("\(.key)=\"\((if (.value | type) == "array" then .value[0] else .value end)|tostring)\"")|.[]' > terraform.tfvars
+    - name: Check terraform.tfvars
+      run: |
+        pwd
+        cat terraform.tfvars
+        terraform fmt
+
+    - name: Add Labels
+      id: add-labels
+      uses: issue-ops/labeler@v2.1.0
+      with:
+        action: add
+        issue_number: ${{ github.event.issue.number }}
+        labels: |
+          deploying 🚀⌛️
+          azure ☁️
+          terraform 🔧
+
+    - name: Set up Terraform 🧳
+      uses: hashicorp/setup-terraform@v3
+
+    - name: Terraform Init 🏗
+      id: init
+      run: | 
+        terraform init \
+        -backend-config="resource_group_name=${{ secrets.TF_STATE_RESOURCE_GROUP_NAME }}" \
+        -backend-config="storage_account_name=${{ secrets.TF_STATE_AZURE_STORAGE_NAME }}" \
+        -backend-config="container_name=${{ secrets.TF_STATE_CONTAINER_NAME }}" \
+        -backend-config="key=issue-${{ github.event.issue.number }}-terraform.tfstate" \
+        -backend-config="access_key=${{ secrets.TF_STATE_STORAGE_ACCESS_KEY }}"
+
+    - name: Terraform Format 🖌
+      id: fmt
+      run: | 
+        terraform fmt -check -no-color
+    
+    - name: Terraform Validate 🧪
+      id: validate
+      run: | 
+        terraform validate -no-color 
+
+    - name: Terraform Plan 📖
+      id: plan
+      run: | 
+        terraform plan \
+        -var "subscription_id=${{ secrets.TF_SUBSCRIPTION_ID }}" -no-color -out=tfplan.out
+      continue-on-error: true
+
+    - name: Upload a Build Artifact 🎁
+      uses: actions/upload-artifact@v4.4.3
+      with:
+        path: ./terraform/tfplan.out
+
+    - uses: actions/github-script@v6
+      name: Comment on Issue with the run id of this GitHub Action Workflow run 🚀
+      with:
+        github-token: ${{secrets.GITHUB_TOKEN}}
+        script: |
+          const workflow_id = "${{ github.run_id }}";
+          github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `Run ID: ${workflow_id}`
+            })
+
+    - uses: actions/github-script@v6
+      name: Comment with Plan
+      env:
+        PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+            const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
+            #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
+            #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
+            <details><summary>Validation Output</summary>
+      
+            \`\`\`\n
+            ${{ steps.validate.outputs.stdout }}
+            \`\`\`
+      
+            </details>
+      
+            #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
+            
+            <details><summary>Show Plan</summary>
+            
+            \`\`\`\n
+            ${process.env.PLAN}
+            \`\`\`
+            
+            </details>
+            
+            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ env.tf_actions_working_dir }}\`, Workflow: \`${{ github.workflow }}\`*`;
+              
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
