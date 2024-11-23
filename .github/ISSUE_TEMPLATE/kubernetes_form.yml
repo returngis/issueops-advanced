@@ -35,4 +35,4 @@ body:
         - francecentral
         - westeurope
         - northeurope
-      default: spaincentral
+      default: 0
