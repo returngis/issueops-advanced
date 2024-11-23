@@ -30,7 +30,9 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-
+    - name: Check labels
+      run:  |
+        echo ${{ github.event.issue.labels }}
     - name: Parse Issue
       id: parser
       uses: issue-ops/parser@v4.0.0
