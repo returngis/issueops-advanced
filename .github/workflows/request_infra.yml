@@ -105,7 +105,7 @@ jobs:
       with:
         path: ./terraform/tfplan.out
 
-    - uses: actions/github-script@v6
+    - uses: actions/github-script@v7
       name: Comment on Issue with the run id of this GitHub Action Workflow run 🚀
       with:
         github-token: ${{secrets.GITHUB_TOKEN}}
@@ -118,7 +118,7 @@ jobs:
               body: `Run ID: ${workflow_id}`
             })
 
-    - uses: actions/github-script@v6
+    - uses: actions/github-script@v7
       name: Comment with Plan
       env:
         PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
