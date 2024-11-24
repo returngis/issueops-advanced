@@ -17,12 +17,11 @@ concurrency:
   group: ${{ github.event.issue.number }}
   cancel-in-progress: true
 
-permissions:
+permissions: write-all
   # contents: read
   # issues: write
   # actions: read
-  # repository-projects: write  
-  permissions: write-all
+  # repository-projects: write   
 
 jobs:
   deploy_infra:
