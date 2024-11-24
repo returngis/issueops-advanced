@@ -4,9 +4,9 @@ on:
   issues: 
     types: opened
 
-defaults:
-  run:
-    working-directory: ./terraform
+# defaults:
+#   run:
+#     working-directory: ./terraform
 
 env:
   ARM_SUBSCRIPTION_ID: ${{ secrets.TF_SUBSCRIPTION_ID }}
@@ -35,6 +35,7 @@ jobs:
           labels=$(echo '${{ toJson(github.event.issue.labels) }}' | jq -r '.[] | select(.name | startswith("issueops:")) | .name')
           if [ -n "$labels" ]; then
             echo "Label found: $labels"
+            echo "TF_WORKDIR=terraform/$labels" >> $GITHUB_ENV  
           else
             echo "No label found starting with 'palabra'"
           fi
@@ -89,16 +90,19 @@ jobs:
         -backend-config="container_name=${{ secrets.TF_STATE_CONTAINER_NAME }}" \
         -backend-config="key=issue-${{ github.event.issue.number }}-terraform.tfstate" \
         -backend-config="access_key=${{ secrets.TF_STATE_STORAGE_ACCESS_KEY }}"
+      working-directory: ${{ env.TF_WORKDIR }}
 
     - name: Terraform Format 🖌
       id: fmt
       run: | 
         terraform fmt -check -no-color
+      working-directory: ${{ env.TF_WORKDIR }}
     
     - name: Terraform Validate 🧪
       id: validate
       run: | 
         terraform validate -no-color 
+      working-directory: ${{ env.TF_WORKDIR }}
 
     - name: Terraform Plan 📖
       id: plan
@@ -106,11 +110,13 @@ jobs:
         terraform plan \
         -var "subscription_id=${{ secrets.TF_SUBSCRIPTION_ID }}" -no-color -out=tfplan.out
       continue-on-error: true
+      working-directory: ${{ env.TF_WORKDIR }}
+      
 
     - name: Upload a Build Artifact 🎁
       uses: actions/upload-artifact@v4.4.3
       with:
-        path: ./terraform/tfplan.out
+        path: ${{ env.TF_WORKDIR }}/tfplan.out
 
     - uses: actions/github-script@v7
       name: Comment on Issue with the run id of this GitHub Action Workflow run 🚀
