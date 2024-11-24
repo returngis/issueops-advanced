@@ -80,7 +80,7 @@ jobs:
         action: add
         issue_number: ${{ github.event.issue.number }}
         labels: |
-          deploying 🚀⌛️
+          requested 👆🏻⌛️
           azure ☁️
           terraform 🔧
 
