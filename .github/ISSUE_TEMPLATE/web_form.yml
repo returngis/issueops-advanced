@@ -2,7 +2,7 @@ name: 👩🏼‍💻 Azure App Service request
 description: This form is used to create Azure infrastructure
 title: "👩🏼‍💻☁️ Create an Azure App Service"
 labels: ["issueops:web"]
-projects: ["returngis/7"]
+projects: ["returngis/8"]
 assignees:
   - teams/devs
   - 0gis0
