@@ -126,6 +126,10 @@ jobs:
     - name: Change the status to Deployed 🚀
       run: |
 
+        # gh project list --owner returngis
+
+        gh project list --owner ${{ env.ORG_NAME }}
+
         # gh project view 8 --owner returngis
         gh project view ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }}
 
