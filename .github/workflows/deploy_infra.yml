@@ -21,6 +21,7 @@ permissions:
   contents: read
   issues: write
   actions: read
+  projects: write
 
 jobs:
   deploy_infra:
@@ -84,7 +85,7 @@ jobs:
     - name: List files in artifact
       run: ls $GITHUB_WORKSPACE
 
-    - name: Set up Terraform
+    - name: Set up Terraform 🧳
       uses: hashicorp/setup-terraform@v3
 
     - name: Terraform Init 🏗
@@ -98,13 +99,13 @@ jobs:
         -backend-config="access_key=${{ secrets.TF_STATE_STORAGE_ACCESS_KEY }}"
       working-directory: ${{ env.TF_WORKDIR }}
 
-    - name: Terraform Apply     
+    - name: Terraform Apply Plan 🚀
       id: apply
       run: |
         terraform apply -auto-approve $GITHUB_WORKSPACE/tfplan.out
       working-directory: ${{ env.TF_WORKDIR }}
 
-    - name: Remove Labels
+    - name: Remove Labels 🗑️
       id: remove-labels
       uses: issue-ops/labeler@v2.1.0
       with:
@@ -113,7 +114,7 @@ jobs:
         labels: |
           deploying 🚀⌛️         
 
-    - name: Add Labels
+    - name: Add Labels 
       id: add-labels
       uses: issue-ops/labeler@v2.1.0
       with:
@@ -145,6 +146,8 @@ jobs:
 
         # gh project item-edit --id PVTI_lADOA9pFl84AtAnvzgVFbag  --field-id "Status" --text "Deployed 🚀" --project-id PVT_kwDOA9pFl84AtAnv
         gh project item-edit --id $PROJECT_ITEM_ID --field-id "Status" --text "Deployed 🚀" --project-id $PROJECT_ID
+      env:
+        GH_TOKEN: ${{ github.token }}
 
             
     
