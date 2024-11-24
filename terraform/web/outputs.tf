@@ -7,5 +7,5 @@ output "location" {
 }
 
 output "web_name" {
-  value = azurerm_storage_account.web.name
+  value = azurerm_windows_web_app.web.name
 }
