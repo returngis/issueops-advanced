@@ -11,5 +11,15 @@
 		"ghcr.io/devcontainers/features/azure-cli:1": {
 			"version": "latest"
 		}
+	},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"redhat.vscode-yaml",
+				"GitHub.copilot",
+				"GitHub.copilot-chat",
+				"hashicorp.terraform"
+			]
+		}
 	}
 }

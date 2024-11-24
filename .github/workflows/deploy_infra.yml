@@ -5,10 +5,6 @@ on:
     types: [created]
 
 
-defaults:
-  run:
-    working-directory: ./terraform
-
 env:
   ARM_SUBSCRIPTION_ID: ${{ secrets.TF_SUBSCRIPTION_ID }}
   ARM_CLIENT_ID: ${{ secrets.TF_CLIENT_ID }}
@@ -28,15 +24,31 @@ jobs:
   deploy_infra:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v4   
+
     - uses: github/command@v1.2.2
       id: command
       with:
-        command: ".deploy"
+        command: ".approved"
         reaction: "rocket"
         allowed_contexts: "issue"
         permissions: "maintain,admin"
         allowlist: 0gis0
+
+    - name: Check for label starting with "issueops:"
+      run: |
+          labels=$(echo '${{ toJson(github.event.issue.labels) }}' | jq -r '.[] | select(.name | startswith("issueops:")) | .name')
+          if [ -n "$labels" ]; then
+            echo "Label found: $labels"
+
+            # label without issueops: prefix
+            infra_type=$(echo $labels | sed 's/issueops://')
+
+            echo "TF_WORKDIR=terraform/$infra_type" >> $GITHUB_ENV 
+            echo "INFRA_TYPE=$infra_type" >> $GITHUB_ENV
+          else
+            echo "No label found starting with 'palabra'"
+          fi    
 
     - name: Find Comments
       id: fc
@@ -82,11 +94,13 @@ jobs:
         -backend-config="container_name=${{ secrets.TF_STATE_CONTAINER_NAME }}" \
         -backend-config="key=issue-${{ github.event.issue.number }}-terraform.tfstate" \
         -backend-config="access_key=${{ secrets.TF_STATE_STORAGE_ACCESS_KEY }}"
+      working-directory: ${{ env.TF_WORKDIR }}
 
     - name: Terraform Apply     
       id: apply
       run: |
         terraform apply -auto-approve $GITHUB_WORKSPACE/tfplan.out
+      working-directory: ${{ env.TF_WORKDIR }}
 
     - name: Remove Labels
       id: remove-labels

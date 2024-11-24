@@ -4,9 +4,6 @@ on:
   issues: 
     types: opened
 
-# defaults:
-#   run:
-#     working-directory: ./terraform
 
 env:
   ARM_SUBSCRIPTION_ID: ${{ secrets.TF_SUBSCRIPTION_ID }}
