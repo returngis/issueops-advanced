@@ -30,7 +30,14 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-
+    - name: Check for label starting with "issueops:"
+      run: |
+          labels=$(echo '${{ toJson(github.event.issue.labels) }}' | jq -r '.[] | select(.name | startswith("issueops:")) | .name')
+          if [ -n "$labels" ]; then
+            echo "Label found: $labels"
+          else
+            echo "No label found starting with 'palabra'"
+          fi
     - name: Parse Issue
       id: parser
       uses: issue-ops/parser@v4.0.0
