@@ -75,6 +75,7 @@ jobs:
         pwd
         cat terraform.tfvars
         terraform fmt
+      working-directory: ${{ env.TF_WORKDIR }}
 
     - name: Add Labels
       id: add-labels
