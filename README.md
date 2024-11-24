@@ -10,6 +10,7 @@ Para poder usar este repositorio necesitas:
 - **Registrar una aplicación en Microsoft Entra ID** que nos permita desplegar los recursos en Azure a través de Terraform. Puedes hacerlo con esta línea: 
 ```bash
 az login
+
 AZURE_CREDENTIALS=$(az ad sp create-for-rbac --name "issueOps-advanced" --role contributor --scopes /subscriptions/$(az account show --query id -o tsv))
 ```
 - **Crear los siguientes secretos** para los flujos de GitHub Actions:
@@ -21,11 +22,11 @@ AZURE_CREDENTIALS=$(az ad sp create-for-rbac --name "issueOps-advanced" --role c
 Para hacerlo de forma sencilla puedes utilizar GitHub CLI:
 
 ```bash
-gh auth login -s codespace
+gh auth login
 
 gh secret set TF_SUBSCRIPTION_ID -b"$(az account show --query id -o tsv)"
-gh secret set TF_CLIENT_ID -b"$(echo $CREDENTIALS | jq -r .appId)"
-gh secret set TF_CLIENT_SECRET -b"$(echo $CREDENTIALS | jq -r .password)"
+gh secret set TF_CLIENT_ID -b"$(echo $AZURE_CREDENTIALS | jq -r .appId)"
+gh secret set TF_CLIENT_SECRET -b"$(echo $AZURE_CREDENTIALS | jq -r .password)"
 gh secret set TF_TENANT_ID -b"$(az account show --query tenantId -o tsv)"
 ```
 
@@ -56,8 +57,8 @@ También puedes hacerlo con GitHub CLI:
 ACCESS_KEY=$(az storage account keys list --account-name $STORAGE_NAME --resource-group $RG_NAME --query "[0].value" -o tsv)
 
 
-gh secret set TF_STATE_RESOURCE_GROUP_NAME $RG_NAME
-gh secret set TF_STATE_AZURE_STORAGE_NAME $STORAGE_NAME
-gh secret set TF_STATE_CONTAINER_NAME $CONTAINER_NAME
-gh secret set TF_STATE_STORAGE_ACCESS_KEY $ACCESS_KEY
+gh secret set TF_STATE_RESOURCE_GROUP_NAME -b"$RG_NAME"
+gh secret set TF_STATE_AZURE_STORAGE_NAME -b"$STORAGE_NAME"
+gh secret set TF_STATE_CONTAINER_NAME -b"$CONTAINER_NAME"
+gh secret set TF_STATE_STORAGE_ACCESS_KEY -b"$ACCESS_KEY"
 ``` 
