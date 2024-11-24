@@ -18,11 +18,11 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: read
-  issues: write
-  actions: read
-  repository-projects: write
-  project: read
+  # contents: read
+  # issues: write
+  # actions: read
+  # repository-projects: write  
+  permissions: write-all
 
 jobs:
   deploy_infra:
