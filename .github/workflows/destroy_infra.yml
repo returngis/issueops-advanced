@@ -4,9 +4,6 @@ on:
   issues: 
     types: closed
 
-defaults:
-  run:
-    working-directory: ./terraform
 
 env:
   ARM_SUBSCRIPTION_ID: ${{ secrets.TF_SUBSCRIPTION_ID }}
@@ -33,6 +30,21 @@ jobs:
     steps:
       - name: Checkout code 🛎
         uses: actions/checkout@v4
+
+      - name: Check for label starting with "issueops:"
+        run: |
+            labels=$(echo '${{ toJson(github.event.issue.labels) }}' | jq -r '.[] | select(.name | startswith("issueops:")) | .name')
+            if [ -n "$labels" ]; then
+              echo "Label found: $labels"
+
+              # label without issueops: prefix
+              infra_type=$(echo $labels | sed 's/issueops://')
+
+              echo "TF_WORKDIR=terraform/$infra_type" >> $GITHUB_ENV 
+              echo "INFRA_TYPE=$infra_type" >> $GITHUB_ENV
+            else
+              echo "No label found starting with 'palabra'"
+            fi    
 
       - name: Set up Terraform 💼
         uses: hashicorp/setup-terraform@v3.1.2
