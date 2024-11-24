@@ -23,7 +23,7 @@ resource "azurerm_service_plan" "plan" {
 
   os_type = "Windows"
 
-  sku_name = "S1"
+  sku_name = "F1"
 }
 
 # Create Web App
