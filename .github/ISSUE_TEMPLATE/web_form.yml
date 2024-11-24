@@ -10,12 +10,12 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for opening an issue to create an Azure Storage Account 📦☁️". Please fill out the sections below.
+        Thanks for opening an issue to create an Azure Web App". Please fill out the sections below.
   - type: input
-    id: storage_account_name
+    id: web_name
     attributes:
-      label: Storage Account Name
-      description: "Please enter the name of the Azure Storage Account"
+      label: Web Name
+      description: "Please enter the name of the Azure Web App"
     validations:
       required: true
   - type: input

@@ -16,19 +16,9 @@ variable "resource_group_name" {
 
 }
 
-variable "storage_account_name" {
-  description = "The name of the storage account"
+variable "web_name" {
+  description = "The name of the web app"
   type        = string
-
-  validation {
-    condition     = length(var.storage_account_name) <= 24
-    error_message = "The storage account name must be at most 24 characters long"
-  }
-
-  validation {
-    condition     = can(regex("^[a-z0-9]*$", var.storage_account_name))
-    error_message = "The value cannot contains - or _"
-  }
 
 }
 
