@@ -68,6 +68,8 @@ jobs:
 
     - name: Convert Issue Form to Terraform.tfvars
       run: echo '${{ steps.parser.outputs.json }}' | jq -r 'to_entries|map("\(.key)=\"\((if (.value | type) == "array" then .value[0] else .value end)|tostring)\"")|.[]' > terraform.tfvars
+      working-directory: ${{ env.TF_WORKDIR }}
+
     - name: Check terraform.tfvars
       run: |
         pwd
