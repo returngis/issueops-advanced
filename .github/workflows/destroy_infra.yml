@@ -72,6 +72,7 @@ jobs:
        
       - name: Check the content of the terraform.tfvars file
         run: cat terraform.tfvars
+        working-directory: ${{ env.TF_WORKDIR }}
 
       - name: Terraform Destroy 🧨
         run: |
