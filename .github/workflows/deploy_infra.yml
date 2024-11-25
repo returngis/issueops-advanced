@@ -144,7 +144,7 @@ jobs:
 
     - name: Check issue in the project
       run: |
-        gh project item-list ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }} --format json | jq '.items[]'
+        gh project item-list ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }} --format json
       env:
         GH_TOKEN: ${{ steps.generate-token.outputs.token }}
 
