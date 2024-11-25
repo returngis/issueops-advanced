@@ -111,7 +111,7 @@ jobs:
         action: remove
         issue_number: ${{ github.event.issue.number }}
         labels: |
-          deploying 🚀⌛️         
+          requested 👆🏻⌛️         
 
     - name: Add Labels 
       id: add-labels
@@ -134,22 +134,19 @@ jobs:
       run: |
 
         # gh project list --owner returngis
-
-        gh project list --owner ${{ env.ORG_NAME }}
+        # gh project list --owner ${{ env.ORG_NAME }}
 
         # gh project view 8 --owner returngis
-        gh project view ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }}
+        # gh project view ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }}
 
         # gh project view 8 --owner returngis --format json -q '.id'
         PROJECT_ID=$(gh project view ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }} --format json | jq .id)
 
         # gh project item-list 8 --owner returngis
-        gh project item-list ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }}
+        # gh project item-list ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }}
 
-        # gh project item-list 8 --format json --owner returngis --jq '.items[] | select(.content.number == 19)'
-        PROJECT_ITEM=$(gh project item-list ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }} --format json | jq '.items[] | select(.content.number == ${{ github.event.issue.number }})')
-
-        PROJECT_ITEM_ID=$(echo $PROJECT_ITEM | jq .id)
+        # gh project item-list 8 --format json --owner returngis --jq '.items[] | select(.content.number == 15) | .id'
+        PROJECT_ITEM_ID=$(gh project item-list ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }} --format json | jq '.items[] | select(.content.number == ${{ github.event.issue.number }})' | jq .id)        
 
         # gh project field-list 8 --owner returngis --format json | jq '.fields[] | select(.name == "Status") | .id'
         STATUS_FIELD_ID=$(gh project field-list ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }} --format json | jq '.fields[] | select(.name == "Status") | .id')
