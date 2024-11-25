@@ -143,6 +143,8 @@ jobs:
         response=$(gh api graphql -f query="$query")
         project_id=$(echo "$response" | jq -r '.data.organization.projectV2.id')
         echo "Project ID: $project_id"
+      env:
+        GH_TOKEN: ${{ steps.generate-token.outputs.token }}
 
 
     # - name: Check issue number
