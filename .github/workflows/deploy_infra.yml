@@ -125,9 +125,9 @@ jobs:
     - name: Generate token
       id: generate-token
       uses: actions/create-github-app-token@v1
-        with:
-          app-id: ${{ secrets.ISSUE_OPS_APP_ID }}
-          private-key: ${{ secrets.ISSUE_OPS_APP_PEM }}
+      with:
+        app-id: ${{ secrets.ISSUE_OPS_APP_ID }}
+        private-key: ${{ secrets.ISSUE_OPS_APP_PEM }}
     
     
     - name: Change the status to Deployed 🚀
