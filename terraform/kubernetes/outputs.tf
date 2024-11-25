@@ -7,5 +7,5 @@ output "location" {
 }
 
 output "k8s_name" {
-  # value = azurerm_storage_account.storage.name
+  value = azurerm_kubernetes_cluster.k8s.name
 }
