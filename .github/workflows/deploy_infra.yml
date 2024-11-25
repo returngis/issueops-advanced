@@ -159,8 +159,3 @@ jobs:
         gh project item-edit --id $PROJECT_ITEM_ID --field-id "Status" --text "Deployed 🚀" --project-id $PROJECT_ID
       env:
         GH_TOKEN: ${{ steps.generate-token.outputs.token }}
-
-            
-    
-    
-          
