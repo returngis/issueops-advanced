@@ -152,11 +152,17 @@ jobs:
         {
           organization(login: "returngis") {
             projectV2(number: 8) {
+              id
               items(first: 100) {
                 nodes {
                   id
                   content {
-                    number
+                    ... on Issue {
+                      number
+                    }
+                    ... on PullRequest {
+                      number
+                    }
                   }
                 }
               }
