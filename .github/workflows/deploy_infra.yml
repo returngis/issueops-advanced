@@ -142,11 +142,23 @@ jobs:
       env:
         GH_TOKEN: ${{ steps.generate-token.outputs.token }}
 
+    - name: Check issue in the project
+      run: |
+        gh project item-list ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }} --format json | jq '.items[]'
+      env:
+        GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+
+
+    - name: See issue number ${{ github.event.issue.number }}
+      run: |
+         gh project item-list ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }} --format json | jq '.items[] | select(.content.number == ${{ github.event.issue.number }})'
+      env:
+        GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+
 
     - name: Get the project item ID and put as an output
       id: project_item_id
-      run: |
-        gh project item-list ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }} --format json | jq '.items[] | select(.content.number == ${{ github.event.issue.number }})'
+      run: |       
         ISSUE_IN_PROJECT_ID=$(gh project item-list ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }} --format json | jq '.items[] | select(.content.number == ${{ github.event.issue.number }})' | jq .id)
         echo "::set-output name=project_item_id::$ISSUE_IN_PROJECT_ID"
       env:
