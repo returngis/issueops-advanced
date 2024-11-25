@@ -146,16 +146,22 @@ jobs:
         # gh project item-list 8 --owner returngis
         gh project item-list ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }}
 
-        # gh project item-list 8 --format json --owner returngis --jq '.items[] | select(.content.number == 10)'
+        # gh project item-list 8 --format json --owner returngis --jq '.items[] | select(.content.number == 19)'
         PROJECT_ITEM=$(gh project item-list ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }} --format json | jq '.items[] | select(.content.number == ${{ github.event.issue.number }})')
 
         PROJECT_ITEM_ID=$(echo $PROJECT_ITEM | jq .id)
 
+        # gh project field-list 8 --owner returngis --format json | jq '.fields[] | select(.name == "Status") | .id'
+        STATUS_FIELD_ID=$(gh project field-list ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }} --format json | jq '.fields[] | select(.name == "Status") | .id')
+
         echo "Project ID: $PROJECT_ID"
+        echo "Project Item ID: $PROJECT_ITEM_ID"
+        echo "Status Field ID: $STATUS_FIELD_ID"
 
         echo "Change to Deployed"
 
-        # gh project item-edit --id PVTI_lADOA9pFl84AtAnvzgVFbag  --field-id "Status" --text "Deployed 🚀" --project-id PVT_kwDOA9pFl84AtAnv
-        gh project item-edit --id $PROJECT_ITEM_ID --field-id "Status" --text "Deployed 🚀" --project-id $PROJECT_ID
+        # gh project item-edit --id PVTI_lADOA9pFl84AtAnvzgVGAeQ  --field-id "Status" --text "Deployed 🚀" --project-id PVT_kwDOA9pFl84AtAnv
+        gh project item-edit --id $PROJECT_ITEM_ID --field-id $STATUS_FIELD_ID --text "Deployed 🚀" --project-id $PROJECT_ID
+
       env:
         GH_TOKEN: ${{ steps.generate-token.outputs.token }}
