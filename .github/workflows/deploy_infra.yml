@@ -129,6 +129,9 @@ jobs:
         app-id: ${{ secrets.ISSUE_OPS_APP_ID }}
         private-key: ${{ secrets.ISSUE_OPS_APP_PEM }}
     
+
+    - name: Check issue number
+      run: echo "Issue number: ${{ github.event.issue.number }}"
     
     - name: Change the status to Deployed 🚀
       run: |
