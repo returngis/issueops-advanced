@@ -2,7 +2,7 @@ name: 📦 Azure Storage request
 description: This form is used to create Azure infrastructure
 title: "📦☁️ Create an Azure Storage Account"
 labels: ["issueops:storage"]
-projects: ["returngis/7"]
+projects: ["returngis/8"]
 assignees:
   - teams/devs
   - 0gis0
@@ -29,7 +29,7 @@ body:
     id: region
     attributes:
       label: Region
-      multiple: true
+      multiple: false
       options:
         - spaincentral
         - francecentral

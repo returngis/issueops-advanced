@@ -5,15 +5,13 @@ on:
     types: [created]
 
 
-defaults:
-  run:
-    working-directory: ./terraform
-
 env:
   ARM_SUBSCRIPTION_ID: ${{ secrets.TF_SUBSCRIPTION_ID }}
   ARM_CLIENT_ID: ${{ secrets.TF_CLIENT_ID }}
   ARM_CLIENT_SECRET: ${{ secrets.TF_CLIENT_SECRET }}
   ARM_TENANT_ID: ${{ secrets.TF_TENANT_ID }}
+  PROJECT_NUMBER: 8
+  ORG_NAME: returngis
 
 concurrency:
   group: ${{ github.event.issue.number }}
@@ -22,21 +20,37 @@ concurrency:
 permissions:
   contents: read
   issues: write
-  actions: read
+  actions: read  
 
 jobs:
   deploy_infra:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v4   
+
     - uses: github/command@v1.2.2
       id: command
       with:
-        command: ".deploy"
+        command: ".approved"
         reaction: "rocket"
         allowed_contexts: "issue"
         permissions: "maintain,admin"
         allowlist: 0gis0
+
+    - name: Check for label starting with "issueops:"
+      run: |
+          labels=$(echo '${{ toJson(github.event.issue.labels) }}' | jq -r '.[] | select(.name | startswith("issueops:")) | .name')
+          if [ -n "$labels" ]; then
+            echo "Label found: $labels"
+
+            # label without issueops: prefix
+            infra_type=$(echo $labels | sed 's/issueops://')
+
+            echo "TF_WORKDIR=terraform/$infra_type" >> $GITHUB_ENV 
+            echo "INFRA_TYPE=$infra_type" >> $GITHUB_ENV
+          else
+            echo "No label found starting with 'palabra'"
+          fi    
 
     - name: Find Comments
       id: fc
@@ -70,7 +84,7 @@ jobs:
     - name: List files in artifact
       run: ls $GITHUB_WORKSPACE
 
-    - name: Set up Terraform
+    - name: Set up Terraform 🧳
       uses: hashicorp/setup-terraform@v3
 
     - name: Terraform Init 🏗
@@ -82,22 +96,24 @@ jobs:
         -backend-config="container_name=${{ secrets.TF_STATE_CONTAINER_NAME }}" \
         -backend-config="key=issue-${{ github.event.issue.number }}-terraform.tfstate" \
         -backend-config="access_key=${{ secrets.TF_STATE_STORAGE_ACCESS_KEY }}"
+      working-directory: ${{ env.TF_WORKDIR }}
 
-    - name: Terraform Apply     
+    - name: Terraform Apply Plan 🚀
       id: apply
       run: |
         terraform apply -auto-approve $GITHUB_WORKSPACE/tfplan.out
+      working-directory: ${{ env.TF_WORKDIR }}
 
-    - name: Remove Labels
+    - name: Remove Labels 🗑️
       id: remove-labels
       uses: issue-ops/labeler@v2.1.0
       with:
         action: remove
         issue_number: ${{ github.event.issue.number }}
         labels: |
-          deploying 🚀⌛️         
+          requested 👆🏻⌛️         
 
-    - name: Add Labels
+    - name: Add Labels 
       id: add-labels
       uses: issue-ops/labeler@v2.1.0
       with:
@@ -105,4 +121,81 @@ jobs:
         issue_number: ${{ github.event.issue.number }}
         labels: |
           deployed 🚀✅
-          
+
+    - name: Generate token
+      id: generate-token
+      uses: actions/create-github-app-token@v1
+      with:
+        app-id: ${{ secrets.ISSUE_OPS_APP_ID }}
+        private-key: ${{ secrets.ISSUE_OPS_APP_PEM }}
+    
+
+    - name: Get project ID using GraphQL
+      run: |
+        query='
+        {
+          organization(login: "returngis") {
+            projectV2(number: 8) {
+              id
+            }
+          }
+        }'
+        response=$(gh api graphql -f query="$query")
+        project_id=$(echo "$response" | jq -r '.data.organization.projectV2.id')
+        echo "Project ID: $project_id"
+
+
+    # - name: Check issue number
+    #   run: |
+    #     echo "Issue number: ${{ github.event.issue.number }}"
+    
+    # - name: Get the project ID and put as an output
+    #   id: project_id
+    #   run: |
+    #     PROJECT_ID=$(gh project view ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }} --format json | jq .id)
+    #     echo "::set-output name=project_id::$PROJECT_ID"
+    #   env:
+    #     GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+
+    # - name: Check issue in the project
+    #   run: |
+    #     gh project item-list ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }} --format json
+    #   env:
+    #     GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+
+
+    # - name: See issue number ${{ github.event.issue.number }}
+    #   run: |
+    #      gh project item-list ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }} --format json | jq '.items[] | select(.content.number == ${{ github.event.issue.number }})'
+    #   env:
+    #     GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+
+
+    # - name: Get the project item ID and put as an output
+    #   id: project_item_id
+    #   run: |       
+    #     ISSUE_IN_PROJECT_ID=$(gh project item-list ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }} --format json | jq '.items[] | select(.content.number == ${{ github.event.issue.number }})' | jq .id)
+    #     echo "::set-output name=project_item_id::$ISSUE_IN_PROJECT_ID"
+    #   env:
+    #     GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+
+    
+    # - name : Get the status field ID and put as an output
+    #   id: status_field_id
+    #   run: |
+    #     STATUS_FIELD_ID=$(gh project field-list ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }} --format json | jq '.fields[] | select(.name == "Status") | .id')
+    #     echo "::set-output name=status_field_id::$STATUS_FIELD_ID"
+    #   env:
+    #     GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+
+    # - name: Check values
+    #   run: |
+    #     echo "Project ID: ${{ steps.project_id.outputs.project_id }}"
+    #     echo "Project Item ID: ${{ steps.project_item_id.outputs.project_item_id }}"
+    #     echo "Status Field ID: ${{ steps.status_field_id.outputs.status_field_id }}"
+
+    # - name: Change the status to Deployed 🚀
+    #   run: |
+    #     gh project item-edit --id ${{ steps.project_item_id.outputs.project_item_id }} --field-id ${{ steps.status_field_id.outputs.status_field_id }} --text "Deployed 🚀" --project-id ${{ steps.project_id.outputs.project_id }}
+    #   env:
+    #     GH_TOKEN: ${{ steps.generate-token.outputs.token }}

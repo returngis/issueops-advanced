@@ -2,7 +2,7 @@ name: 👩🏼‍💻 Azure App Service request
 description: This form is used to create Azure infrastructure
 title: "👩🏼‍💻☁️ Create an Azure App Service"
 labels: ["issueops:web"]
-projects: ["returngis/7"]
+projects: ["returngis/8"]
 assignees:
   - teams/devs
   - 0gis0
@@ -10,12 +10,12 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for opening an issue to create an Azure Storage Account 📦☁️". Please fill out the sections below.
+        Thanks for opening an issue to create an Azure Web App". Please fill out the sections below.
   - type: input
-    id: storage_account_name
+    id: web_name
     attributes:
-      label: Storage Account Name
-      description: "Please enter the name of the Azure Storage Account"
+      label: Web Name
+      description: "Please enter the name of the Azure Web App"
     validations:
       required: true
   - type: input
@@ -29,7 +29,7 @@ body:
     id: region
     attributes:
       label: Region
-      multiple: true
+      multiple: false
       options:
         - spaincentral
         - francecentral
