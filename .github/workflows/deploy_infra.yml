@@ -131,7 +131,8 @@ jobs:
     
 
     - name: Check issue number
-      run: echo "Issue number: ${{ github.event.issue.number }}"
+      run: |
+        echo "Issue number: ${{ github.event.issue.number }}"
     
     - name: Change the status to Deployed 🚀
       run: |
