@@ -3,8 +3,7 @@ description: This form is used to create Azure infrastructure
 title: "⚓️ Create an Azure Kubernetes Service"
 labels: ["issueops:kubernetes"]
 projects: ["returngis/8"]
-assignees:
-  - teams/devs
+assignees:  
   - 0gis0
 body:
   - type: markdown
@@ -12,10 +11,10 @@ body:
       value: |
         Thanks for opening an issue to create an Azure Storage Account 📦☁️". Please fill out the sections below.
   - type: input
-    id: storage_account_name
+    id: k8s_name
     attributes:
-      label: Storage Account Name
-      description: "Please enter the name of the Azure Storage Account"
+      label: Kubernetes Name
+      description: "Please enter the name of the Azure Kubernetes Service"
     validations:
       required: true
   - type: input
