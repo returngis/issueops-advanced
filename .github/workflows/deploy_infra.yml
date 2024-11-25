@@ -169,9 +169,13 @@ jobs:
             }
           }
         }'
+        # response=$(gh api graphql -f query="$query")
+        # project_item_id=$(echo "$response" | jq -r '.data.organization.projectV2.items.nodes[] | select(.content.number == ${{ github.event.issue.number }}) | .id')
+        # echo "Project Item ID: $project_item_id"
+
         response=$(gh api graphql -f query="$query")
-        project_item_id=$(echo "$response" | jq -r '.data.organization.projectV2.items.nodes[] | select(.content.number == ${{ github.event.issue.number }}) | .id')
-        echo "Project Item ID: $project_item_id"
+        echo $response
+
       env:
         GH_TOKEN: ${{ steps.generate-token.outputs.token }}
 
