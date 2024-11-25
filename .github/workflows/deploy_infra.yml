@@ -146,6 +146,29 @@ jobs:
       env:
         GH_TOKEN: ${{ steps.generate-token.outputs.token }}
 
+    - name: Get the project item ID using GraphQL
+      run: |
+        query='
+        {
+          organization(login: "returngis") {
+            projectV2(number: 8) {
+              items(first: 100) {
+                nodes {
+                  id
+                  content {
+                    number
+                  }
+                }
+              }
+            }
+          }
+        }'
+        response=$(gh api graphql -f query="$query")
+        project_item_id=$(echo "$response" | jq -r '.data.organization.projectV2.items.nodes[] | select(.content.number == ${{ github.event.issue.number }}) | .id')
+        echo "Project Item ID: $project_item_id"
+      env:
+        GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+
 
     # - name: Check issue number
     #   run: |
