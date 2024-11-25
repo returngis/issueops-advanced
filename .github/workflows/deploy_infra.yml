@@ -146,7 +146,8 @@ jobs:
     - name: Get the project item ID and put as an output
       id: project_item_id
       run: |
-        ISSUE_IN_PROJECT_ID=$(gh project item-list ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }} --format json | jq '.items[] | select(.content.number == ${{ github.event.issue.number }} ) | jq .id')
+        gh project item-list ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }} --format json | jq '.items[] | select(.content.number == ${{ github.event.issue.number }})'
+        ISSUE_IN_PROJECT_ID=$(gh project item-list ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }} --format json | jq '.items[] | select(.content.number == ${{ github.event.issue.number }})' | jq .id)
         echo "::set-output name=project_item_id::$ISSUE_IN_PROJECT_ID"
       env:
         GH_TOKEN: ${{ steps.generate-token.outputs.token }}
