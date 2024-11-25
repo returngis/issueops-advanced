@@ -17,11 +17,10 @@ concurrency:
   group: ${{ github.event.issue.number }}
   cancel-in-progress: true
 
-permissions: write-all
-  # contents: read
-  # issues: write
-  # actions: read
-  # repository-projects: write   
+permissions:
+  contents: read
+  issues: write
+  actions: read  
 
 jobs:
   deploy_infra:
@@ -123,6 +122,14 @@ jobs:
         labels: |
           deployed 🚀✅
 
+    - name: Generate token
+      id: generate-token
+      uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.ISSUE_OPS_APP_ID }}
+          private-key: ${{ secrets.ISSUE_OPS_APP_PEM }}
+    
+    
     - name: Change the status to Deployed 🚀
       run: |
 
@@ -151,7 +158,7 @@ jobs:
         # gh project item-edit --id PVTI_lADOA9pFl84AtAnvzgVFbag  --field-id "Status" --text "Deployed 🚀" --project-id PVT_kwDOA9pFl84AtAnv
         gh project item-edit --id $PROJECT_ITEM_ID --field-id "Status" --text "Deployed 🚀" --project-id $PROJECT_ID
       env:
-        GH_TOKEN: ${{ github.token }}
+        GH_TOKEN: ${{ steps.generate-token.outputs.token }}
 
             
     
