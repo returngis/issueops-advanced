@@ -12,6 +12,7 @@ jobs:
     steps:
       - uses: actions/stale@v9
         with:
+          close-issue-reason: completed
           days-before-issue-stale: 1
           days-before-issue-close: 2
           stale-issue-label: "stale"
