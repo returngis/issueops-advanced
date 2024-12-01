@@ -105,6 +105,7 @@ jobs:
       working-directory: ${{ env.TF_WORKDIR }}
 
     - name: Remove Labels 🗑️
+      if: always()
       id: remove-labels
       uses: issue-ops/labeler@v2.1.0
       with:
