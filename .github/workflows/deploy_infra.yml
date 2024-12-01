@@ -176,7 +176,8 @@ jobs:
     - name : Get the status field ID and put as an output
       id: status_field_id
       run: |
-        STATUS_FIELD_ID=$(gh project field-list ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }} --format json | jq '.fields[] | select(.name == "Status") | .id')               
+        STATUS_FIELD_ID=$(gh project field-list ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }} --format json | jq '.fields[] | select(.name == "Status") | .id')     
+        echo "status_field_id=$STATUS_FIELD_ID" >> $GITHUB_OUTPUT          
       env:
         GH_TOKEN: ${{ steps.generate-token.outputs.token }}
 
