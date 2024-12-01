@@ -2,7 +2,7 @@ name: ☝🏻🚀 Request Infrastructure with Terraform and Issues
 
 on:
   issues: 
-    types: opened
+    types: [opened]
 
 
 env:

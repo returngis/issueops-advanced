@@ -3,8 +3,7 @@ description: This form is used to create Azure infrastructure
 title: "📦☁️ Create an Azure Storage Account"
 labels: ["issueops:storage"]
 projects: ["returngis/8"]
-assignees:
-  - teams/devs
+assignees:  
   - 0gis0
 body:
   - type: markdown
@@ -26,7 +25,7 @@ body:
     validations:
       required: true
   - type: dropdown
-    id: region
+    id: location
     attributes:
       label: Region
       multiple: false

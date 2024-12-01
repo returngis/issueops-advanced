@@ -25,7 +25,7 @@ body:
     validations:
       required: true
   - type: dropdown
-    id: region
+    id: location
     attributes:
       label: Region
       multiple: false
