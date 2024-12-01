@@ -2,7 +2,7 @@ name: 🚀🧨 Destroy Infrastructure with Terraform
 
 on:
   issues: 
-    types: closed
+    types: [closed]
 
 
 env:
