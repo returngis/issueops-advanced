@@ -217,8 +217,7 @@ jobs:
       env:
         GH_TOKEN: ${{ steps.generate-token.outputs.token }}
 
-    - name: Change the status to Deployed 🚀
-      id: deployed_status_id
+    - name: Change the status to Deployed 🚀      
       if: success()
       run: |       
 
