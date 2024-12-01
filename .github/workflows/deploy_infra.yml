@@ -204,18 +204,25 @@ jobs:
       env:
         GH_TOKEN: ${{ steps.generate-token.outputs.token }}
 
+
+    - name: Check status values
+      if: always()
+      run: |
+        gh project field-list ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }} --format json | jq '.fields[] |  select(.name == "Status")
+
     - name: Change the status to Deployed 🚀
+      id: deployed_status_id
       if: success()
       run: |
 
-       DEPLOYED_STATUS_ID=$(gh project field-list ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }} --format json | jq  '.fields[] |  select(.name == "Status") | .options[] | select(.name == "Deployed 🚀") | .id')
+       DEPLOYED_STATUS_ID=$(gh project field-list ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }} --format json | jq '.fields[] |  select(.name == "Status") | .options[] | select(.name == "Deployed 🚀") | .id')
 
        echo "deployed_status_id=$DEPLOYED_STATUS_ID" >> $GITHUB_OUTPUT
 
         gh project item-edit \
         --id ${{ steps.project_item_id.outputs.project_item_id }} \
         --field-id ${{ steps.status_field_id.outputs.status_field_id }} \
-        --single-select-option-id $DEPLOYED_STATUS_ID \
+        --single-select-option-id "$DEPLOYED_STATUS_ID" \
         --project-id ${{ steps.project_id.outputs.project_id }}
       env:
         GH_TOKEN: ${{ steps.generate-token.outputs.token }}
