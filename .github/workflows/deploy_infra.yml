@@ -117,7 +117,7 @@ jobs:
     # If Terraform apply fails, add the label "failed"
 
     - name: Add Labels
-      if: ${{ failure() }} 
+      if: failure()
       uses: issue-ops/labeler@v2.1.0
       with:
         action: add
@@ -126,7 +126,7 @@ jobs:
           failed 🚀💥         
 
     - name: Add Labels 
-      if: ${{ success() }}
+      if: success()
       uses: issue-ops/labeler@v2.1.0
       with:
         action: add
@@ -188,7 +188,7 @@ jobs:
 
 
     - name: Change the status to Failed 🚀💥
-      if: ${{ failure() }} 
+      if: failure()
       run: |
 
         FAILED_STATUS_ID=$(gh project field-list ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }} --format json | jq  '.fields[] |  select(.name == "Status") | .options[] | select(.name == "Failed 🚀💥") | .id')
@@ -202,7 +202,7 @@ jobs:
         GH_TOKEN: ${{ steps.generate-token.outputs.token }}
 
     - name: Change the status to Deployed 🚀
-      if: ${{ success() }} 
+      if: success()
       run: |
 
        DEPLOYED_STATUS_ID=$(gh project field-list ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }} --format json | jq  '.fields[] |  select(.name == "Status") | .options[] | select(.name == "Deployed 🚀") | .id')
