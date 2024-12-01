@@ -181,11 +181,7 @@ jobs:
       env:
         GH_TOKEN: ${{ steps.generate-token.outputs.token }}
 
-    - name: Check values
-      run: |
-        echo "Project ID: ${{ steps.project_id.outputs.project_id }}"
-        echo "Project Item ID: ${{ steps.project_item_id.outputs.project_item_id }}"
-        echo "Status Field ID: ${{ steps.status_field_id.outputs.status_field_id }}"       
+      
 
 
     - name: Change the status to Failed 🚀💥
@@ -193,6 +189,8 @@ jobs:
       run: |
 
         FAILED_STATUS_ID=$(gh project field-list ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }} --format json | jq  '.fields[] |  select(.name == "Status") | .options[] | select(.name == "Failed 🚀💥") | .id')
+
+        echo "failed_status_id=$FAILED_STATUS_ID" >> $GITHUB_OUTPUT
 
         gh project item-edit \
         --id ${{ steps.project_item_id.outputs.project_item_id }} \
@@ -208,6 +206,8 @@ jobs:
 
        DEPLOYED_STATUS_ID=$(gh project field-list ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }} --format json | jq  '.fields[] |  select(.name == "Status") | .options[] | select(.name == "Deployed 🚀") | .id')
 
+       echo "deployed_status_id=$DEPLOYED_STATUS_ID" >> $GITHUB_OUTPUT
+
         gh project item-edit \
         --id ${{ steps.project_item_id.outputs.project_item_id }} \
         --field-id ${{ steps.status_field_id.outputs.status_field_id }} \
@@ -215,3 +215,12 @@ jobs:
         --project-id ${{ steps.project_id.outputs.project_id }}
       env:
         GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+
+
+    - name: Check values
+      run: |
+        echo "Project ID: ${{ steps.project_id.outputs.project_id }}"
+        echo "Project Item ID: ${{ steps.project_item_id.outputs.project_item_id }}"
+        echo "Status Field ID: ${{ steps.status_field_id.outputs.status_field_id }}"
+        echo "Deployed Status ID: ${{ steps.deployed_status_id.outputs.deployed_status_id }}"
+        echo "Failed Status ID: ${{ steps.failed_status_id.outputs.failed_status_id }}"
