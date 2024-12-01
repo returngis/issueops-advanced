@@ -185,9 +185,6 @@ jobs:
       env:
         GH_TOKEN: ${{ steps.generate-token.outputs.token }}
 
-      
-
-
     - name: Change the status to Failed 🚀💥
       if: failure()
       run: |
@@ -208,7 +205,7 @@ jobs:
     - name: Check status values
       if: always()
       run: |
-        gh project field-list ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }} --format json | jq '.fields[] |  select(.name == "Status")
+        gh project field-list ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }} --format json | jq '.fields[] |  select(.name == "Status")'
 
     - name: Change the status to Deployed 🚀
       id: deployed_status_id
