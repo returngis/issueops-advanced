@@ -18,7 +18,9 @@
 				"redhat.vscode-yaml",
 				"GitHub.copilot",
 				"GitHub.copilot-chat",
-				"hashicorp.terraform"
+				"hashicorp.terraform",
+				"ms-azuretools.vscode-azureresourcegroups",
+				"github.vscode-github-actions"
 			]
 		}
 	}
