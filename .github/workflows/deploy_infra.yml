@@ -173,7 +173,7 @@ jobs:
     - name: Try to get the status field ID
       if: always()
       run: |
-        gh project field-list ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }} --format json | jq  '.fields[] |  select(.id == ${{ steps.status_field_id.outputs.status_field_id }} | .options[] | select(.name == "Failed 🚀💥") | .id'
+        gh project field-list ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }} --format json | jq  '.fields[] |  select(.id == ${{ steps.status_field_id.outputs.status_field_id }}) | .options[] | select(.name == "Failed 🚀💥") | .id'
       env:
         GH_TOKEN: ${{ steps.generate-token.outputs.token }}
     
@@ -181,7 +181,7 @@ jobs:
       if: failure()
       run: |
 
-        FAILED_STATUS_ID=$(gh project field-list ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }} --format json | jq  '.fields[] |  select(.id == ${{ steps.status_field_id.outputs.status_field_id }} | .options[] | select(.name == "Failed 🚀💥") | .id')        
+        FAILED_STATUS_ID=$(gh project field-list ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }} --format json | jq  '.fields[] |  select(.id == ${{ steps.status_field_id.outputs.status_field_id }}) | .options[] | select(.name == "Failed 🚀💥") | .id')        
 
         gh project item-edit \
         --id ${{ steps.project_item_id.outputs.project_item_id }} \
