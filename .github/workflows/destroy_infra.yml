@@ -62,9 +62,15 @@ jobs:
 
 
       - name: Terraform output as JSON
-        run: terraform output -json | jq .
+        run: |
+          ouput=$(terraform output -json | jq .)
+          if [ "$(echo "$output" | jq -e 'length == 0')" == "true" ]; then
+            exit 1
+          else
+            echo "Terraform output is not empty"
+          fi
 
-      - name: Export Terraform Outputs to tfvars
+      - name: Export Terraform Outputs to tfvars                
         run: |
           terraform output -json | jq -r 'to_entries | map("\(.key) = \(.value.value | @json)") | .[]'
           terraform output -json | jq -r 'to_entries | map("\(.key) = \(.value.value | @json)") | .[]'  > terraform.tfvars
