@@ -151,21 +151,6 @@ jobs:
       env:
         GH_TOKEN: ${{ steps.generate-token.outputs.token }}
 
-    # - name: Check issue in the project
-    #   run: |
-    #     gh project item-list ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }} --format json
-    #   env:
-    #     GH_TOKEN: ${{ steps.generate-token.outputs.token }}
-
-
-    # - name: See issue number ${{ github.event.issue.number }}
-    #   run: |
-    #     # gh project item-list 8 --owner returngis --format json --limit 41 | jq '.items[] | select(.content.number == 41)'
-    #     gh project item-list ${{ env.PROJECT_NUMBER }} --limit ${{ github.event.issue.number }} --owner ${{ env.ORG_NAME }} --format json | jq '.items[] | select(.content.number == ${{ github.event.issue.number }})'
-    #   env:
-    #     GH_TOKEN: ${{ steps.generate-token.outputs.token }}
-
-
     - name: Get the project item ID and put as an output
       if: always()
       id: project_item_id
@@ -205,14 +190,16 @@ jobs:
     - name: Check status values
       if: always()
       run: |
-        gh project field-list ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }} --format json | jq '.fields[] |  select(.name == "Status")'
+        gh project field-list ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }} --format json | jq '.fields[] |  select(.id == ${{ steps.status_field_id.outputs.status_field_id }})'
+      env:
+        GH_TOKEN: ${{ steps.generate-token.outputs.token }}
 
     - name: Change the status to Deployed 🚀
       id: deployed_status_id
       if: success()
       run: |
 
-       DEPLOYED_STATUS_ID=$(gh project field-list ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }} --format json | jq '.fields[] |  select(.name == "Status") | .options[] | select(.name == "Deployed 🚀") | .id')
+       DEPLOYED_STATUS_ID=$(gh project field-list ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }} --format json | jq '.fields[] |  select(.id == ${{ steps.status_field_id.outputs.status_field_id }}) | .options[] | select(.name == "Deployed 🚀") | .id')
 
        echo "deployed_status_id=$DEPLOYED_STATUS_ID" >> $GITHUB_OUTPUT
 
