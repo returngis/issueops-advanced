@@ -6,8 +6,7 @@ variable "location" {
 
 variable "resource_group_name" {
   description = "The name of the resource group in which to create resources"
-  type        = string
-  nullable    = false
+  type        = string  
 
   validation {
     condition     = length(var.resource_group_name) <= 90
@@ -24,8 +23,7 @@ variable "k8s_name" {
 
 variable "subscription_id" {
   description = "The Azure subscription ID"
-  type        = string
-  nullable    = false
+  type        = string  
   sensitive   = true
 
   validation {
