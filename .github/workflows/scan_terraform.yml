@@ -1,6 +1,10 @@
 name: Terrascan Scan
 
 on:
+  push:
+    paths:
+      - terraform
+        
   workflow_dispatch:    
     inputs:
       working-directory:
