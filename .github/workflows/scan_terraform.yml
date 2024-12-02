@@ -3,7 +3,7 @@ name: Terrascan Scan
 on:
   push:
     paths:
-      - terraform
+      - 'terraform/**'
         
   workflow_dispatch:    
     inputs:
