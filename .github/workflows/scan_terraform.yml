@@ -3,9 +3,9 @@ name: 🕵🏼‍♀️🔎 Terrascan Scan
 on:
   push:
     paths:
-      - 'terraform/**'
-        
-  workflow_dispatch:    
+      - "terraform/**"
+
+  workflow_dispatch:
     inputs:
       working-directory:
         description: "The directory to run Terrascan in"
@@ -24,12 +24,12 @@ jobs:
       - name: Run Terrascan
         id: terrascan
         # https://github.com/tenable/terrascan-action/
-        uses: tenable/terrascan-action@main        
+        uses: tenable/terrascan-action@main
         with:
           iac_type: "terraform"
           iac_version: "v14"
-          policy_type: "azure"          
-          sarif_upload: true          
+          policy_type: "azure"
+          sarif_upload: true
           iac_dir: ${{ inputs.working-directory }}
 
       - name: Upload SARIF file

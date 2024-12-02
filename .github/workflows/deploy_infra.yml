@@ -104,7 +104,7 @@ jobs:
         terraform apply -auto-approve $GITHUB_WORKSPACE/tfplan.out
       working-directory: ${{ env.TF_WORKDIR }}
 
-    - name: Remove Labels 🗑️
+    - name: Remove Labels 🏷️ 🗑️
       if: always()
       id: remove-labels
       uses: issue-ops/labeler@v2.1.0
@@ -116,7 +116,7 @@ jobs:
     
     # If Terraform apply fails, add the label "failed"
 
-    - name: Add Labels
+    - name: Add Labels 🏷️
       if: failure()
       uses: issue-ops/labeler@v2.1.0
       with:
@@ -125,7 +125,7 @@ jobs:
         labels: |
           failed 🚀💥         
 
-    - name: Add Labels 
+    - name: Add Labels 🏷️
       if: success()
       uses: issue-ops/labeler@v2.1.0
       with:

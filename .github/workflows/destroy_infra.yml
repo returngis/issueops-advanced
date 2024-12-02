@@ -1,9 +1,8 @@
-name: 🚀🧨 Destroy Infrastructure with Terraform 
+name: 🚀🧨 Destroy Infrastructure with Terraform
 
 on:
-  issues: 
+  issues:
     types: [closed]
-
 
 env:
   ARM_SUBSCRIPTION_ID: ${{ secrets.TF_SUBSCRIPTION_ID }}
@@ -19,10 +18,8 @@ permissions:
   contents: read
   issues: write
 
-
 jobs:
   destroy_terraform_infra:
-
     name: "BOOM! 💥"
 
     runs-on: ubuntu-latest
@@ -33,25 +30,25 @@ jobs:
 
       - name: Check for label starting with "issueops:"
         run: |
-            labels=$(echo '${{ toJson(github.event.issue.labels) }}' | jq -r '.[] | select(.name | startswith("issueops:")) | .name')
-            if [ -n "$labels" ]; then
-              echo "Label found: $labels"
+          labels=$(echo '${{ toJson(github.event.issue.labels) }}' | jq -r '.[] | select(.name | startswith("issueops:")) | .name')
+          if [ -n "$labels" ]; then
+            echo "Label found: $labels"
 
-              # label without issueops: prefix
-              infra_type=$(echo $labels | sed 's/issueops://')
+            # label without issueops: prefix
+            infra_type=$(echo $labels | sed 's/issueops://')
 
-              echo "TF_WORKDIR=terraform/$infra_type" >> $GITHUB_ENV 
-              echo "INFRA_TYPE=$infra_type" >> $GITHUB_ENV
-            else
-              echo "No label found starting with 'palabra'"
-            fi    
+            echo "TF_WORKDIR=terraform/$infra_type" >> $GITHUB_ENV 
+            echo "INFRA_TYPE=$infra_type" >> $GITHUB_ENV
+          else
+            echo "No label found starting with 'palabra'"
+          fi
 
       - name: Set up Terraform 💼
         uses: hashicorp/setup-terraform@v3.1.2
 
       - name: Terraform Init 🏗
         id: init
-        run: | 
+        run: |
           terraform init \
           -backend-config="resource_group_name=${{ secrets.TF_STATE_RESOURCE_GROUP_NAME }}" \
           -backend-config="storage_account_name=${{ secrets.TF_STATE_AZURE_STORAGE_NAME }}" \
@@ -59,7 +56,6 @@ jobs:
           -backend-config="key=issue-${{ github.event.issue.number }}-terraform.tfstate" \
           -backend-config="access_key=${{ secrets.TF_STATE_STORAGE_ACCESS_KEY }}"
         working-directory: ${{ env.TF_WORKDIR }}
-
 
       - name: Terraform output as JSON
         run: |
@@ -70,12 +66,12 @@ jobs:
             echo "Terraform output is not empty"
           fi
 
-      - name: Export Terraform Outputs to tfvars                
+      - name: Export Terraform Outputs to tfvars
         run: |
           terraform output -json | jq -r 'to_entries | map("\(.key) = \(.value.value | @json)") | .[]'
           terraform output -json | jq -r 'to_entries | map("\(.key) = \(.value.value | @json)") | .[]'  > terraform.tfvars
         working-directory: ${{ env.TF_WORKDIR }}
-       
+
       - name: Check the content of the terraform.tfvars file
         run: cat terraform.tfvars
         working-directory: ${{ env.TF_WORKDIR }}
@@ -86,16 +82,16 @@ jobs:
           -var="subscription_id=${{ secrets.TF_SUBSCRIPTION_ID }}"
         working-directory: ${{ env.TF_WORKDIR }}
 
-      - name: Remove Labels
+      - name: Remove Labels ␡🏷
         id: remove-labels
         uses: issue-ops/labeler@v2.1.0
         with:
           action: remove
           issue_number: ${{ github.event.issue.number }}
           labels: |
-            deployed 🚀✅        
+            deployed 🚀✅
 
-      - name: Add Labels
+      - name: Add Labels 🏷️
         id: add-labels
         uses: issue-ops/labeler@v2.1.0
         with:
