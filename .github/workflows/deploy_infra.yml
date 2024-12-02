@@ -200,19 +200,11 @@ jobs:
         GH_TOKEN: ${{ steps.generate-token.outputs.token }}
 
 
-    - name: Check status values
-      if: always()
-      run: |
-        gh project field-list ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }} --format json | jq '.fields[] |  select(.id == ${{ steps.status_field_id.outputs.status_field_id }})'
-      env:
-        GH_TOKEN: ${{ steps.generate-token.outputs.token }}
-
-
     - name: Get the deployed status ID and put as an output
       if: always()
       id: deployed_status_id
       run: |
-        DEPLOYED_STATUS_ID=$(gh project field-list ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }} --format json | jq  '.fields[] |  select(.id == ${{ steps.status_field_id.outputs.status_field_id }}) | .options[] | select(.name == "Deployed 🚀✅") | .id')
+        DEPLOYED_STATUS_ID=$(gh project field-list ${{ env.PROJECT_NUMBER }} --owner ${{ env.ORG_NAME }} --format json | jq  '.fields[] |  select(.id == ${{ steps.status_field_id.outputs.status_field_id }}) | .options[] | select(.name == "Deployed 🚀") | .id')
         echo "deployed_status_id=$DEPLOYED_STATUS_ID" >> $GITHUB_OUTPUT
       env:
         GH_TOKEN: ${{ steps.generate-token.outputs.token }}
