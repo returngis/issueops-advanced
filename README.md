@@ -2,6 +2,8 @@
 
 ¡Hola developer 👋🏻! Este repositorio contiene un ejemplo de cómo trabajar con IssueOps, utilizando Issue Forms, GitHub Actions, Terraform para el despliegue de infraestructura y Microsoft Azure como destino. Si quieres verlo en funcionamiento puedes echar un vistazo a este vídeo de mi canal de YouTube:
 
+[![🧪 Prueba de concepto de IssueOps ⚙️ con Terraform](docs/images/Prueba%20de%20IssueOps%20con%20Terraform.png)](https://youtu.be/rIqlgk1IFnU)
+
 ### Requisitos
 
 Para poder usar este repositorio necesitas:
