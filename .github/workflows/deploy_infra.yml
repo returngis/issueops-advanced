@@ -28,7 +28,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4   
 
-    - uses: github/command@v1.2.2
+    - uses: github/command@v1.3.0
       id: command
       with:
         command: ".approved"
