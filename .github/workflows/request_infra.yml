@@ -50,7 +50,7 @@ jobs:
 
       - name: Validate Issue
         id: validate-issue
-        uses: issue-ops/validator@v3.0.0
+        uses: issue-ops/validator@v3.1.1
         with:
           issue-form-template: ${{ env.INFRA_TYPE }}_form.yml
           parsed-issue-body: ${{ steps.parser.outputs.json }}
