@@ -37,7 +37,7 @@ jobs:
           fi
       - name: Parse Issue
         id: parser
-        uses: issue-ops/parser@v4.0.0
+        uses: issue-ops/parser@v4.1.0
         with:
           body: ${{ github.event.issue.body }}
           # issue-form-template	: create_azure_infra_form.yml
