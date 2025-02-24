@@ -113,7 +113,7 @@ jobs:
         working-directory: ${{ env.TF_WORKDIR }}
 
       - name: Upload a Build Artifact 🎁
-        uses: actions/upload-artifact@v4.4.3
+        uses: actions/upload-artifact@v4.6.1
         with:
           path: ${{ env.TF_WORKDIR }}/tfplan.out
 
