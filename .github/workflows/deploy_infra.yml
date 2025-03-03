@@ -75,7 +75,7 @@ jobs:
         echo "::set-output name=run_id::$(echo ${{ steps.fc.outputs.comment-body }} | grep -oP 'Run ID: \K\d+')"
 
     - name: Download artifact related with this issue
-      uses: actions/download-artifact@v4.1.8
+      uses: actions/download-artifact@v4.1.9
       with:
         name: artifact
         github-token: ${{ github.token }}
